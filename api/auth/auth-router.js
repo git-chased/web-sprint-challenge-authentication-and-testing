@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const {checkInfo, isAvailable} = require('../middleware/middleware')
 
 router.post('/register', (req, res) => {
   res.end('implement register, please!');
