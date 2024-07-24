@@ -1,8 +1,29 @@
 const router = require('express').Router();
+const db = require('../../config')
 const {checkInfo, isAvailable} = require('../middleware/middleware')
+const {BCRYPT_ROUNDS} = require('../../config/index')
+const bcrypt = require('bcryptjs');
+const makeToken = require('./auth-helper');
 
-router.post('/register', (req, res) => {
-  res.end('implement register, please!');
+
+
+router.post('/register', checkInfo, isAvailable, async (req, res) => {
+  try {
+    const {username, password} = req.body
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS)
+    const [id] = await db('users').insert({
+      username,
+      password: hashedPassword
+    })
+    res.status(201).json({
+      id,
+      username,
+      password: hashedPassword
+    })
+
+  } catch (err) {
+    next(err)
+  }
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -30,8 +51,26 @@ router.post('/register', (req, res) => {
   */
 });
 
-router.post('/login', (req, res) => {
-  res.end('implement login, please!');
+router.post('/login', checkInfo, async (req, res) => {
+  try {
+    const {username, password} = req.body
+    const [user] = await db('users').where({username})
+    if(!user) {
+      return res.status(401).json({message: 'invalid credentials'})
+    }
+    const passwordValid = await bcrypt.compare(password, user.password)
+    if (!passwordValid) {
+      return rews.status(401).json({message: 'invalid credentials'})
+    }
+    const token = makeToken(user)
+    res.json({
+      message: `welcome, ${user.username}`,
+      token
+    })
+  } catch (err) {
+    next(err)
+  }
+
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
