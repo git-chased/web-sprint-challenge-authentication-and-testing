@@ -7,7 +7,7 @@ const makeToken = require('./auth-helper');
 
 
 
-router.post('/register', checkInfo, isAvailable, async (req, res) => {
+router.post('/register', checkInfo, isAvailable, async (req, res, next) => {
   try {
     const {username, password} = req.body
     const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS)
@@ -27,7 +27,7 @@ router.post('/register', checkInfo, isAvailable, async (req, res) => {
   
 });
 
-router.post('/login', checkInfo, async (req, res) => {
+router.post('/login', checkInfo, async (req, res, next) => {
   try {
     const {username, password} = req.body
     const [user] = await db('users').where({username})
