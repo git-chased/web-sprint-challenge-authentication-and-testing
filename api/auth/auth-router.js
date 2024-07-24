@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const db = require('../../config')
+const db = require('../../data/dbConfig')
 const {checkInfo, isAvailable} = require('../middleware/middleware')
 const {BCRYPT_ROUNDS} = require('../../config/index')
 const bcrypt = require('bcryptjs');
