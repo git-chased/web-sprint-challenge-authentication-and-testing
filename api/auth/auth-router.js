@@ -24,7 +24,36 @@ router.post('/register', checkInfo, isAvailable, async (req, res) => {
   } catch (err) {
     next(err)
   }
-  /*
+  
+});
+
+router.post('/login', checkInfo, async (req, res) => {
+  try {
+    const {username, password} = req.body
+    const [user] = await db('users').where({username})
+    if(!user) {
+      return res.status(401).json({message: 'invalid credentials'})
+    }
+    const passwordValid = await bcrypt.compare(password, user.password)
+    if (!passwordValid) {
+      return res.status(401).json({message: 'invalid credentials'})
+    }
+    const token = makeToken(user)
+    res.json({
+      message: `welcome, ${user.username}`,
+      token
+    })
+  } catch (err) {
+    next(err)
+  }
+
+  
+});
+
+module.exports = router;
+
+
+/*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
     DO NOT EXCEED 2^8 ROUNDS OF HASHING!
@@ -49,29 +78,8 @@ router.post('/register', checkInfo, isAvailable, async (req, res) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-});
 
-router.post('/login', checkInfo, async (req, res) => {
-  try {
-    const {username, password} = req.body
-    const [user] = await db('users').where({username})
-    if(!user) {
-      return res.status(401).json({message: 'invalid credentials'})
-    }
-    const passwordValid = await bcrypt.compare(password, user.password)
-    if (!passwordValid) {
-      return rews.status(401).json({message: 'invalid credentials'})
-    }
-    const token = makeToken(user)
-    res.json({
-      message: `welcome, ${user.username}`,
-      token
-    })
-  } catch (err) {
-    next(err)
-  }
-
-  /*
+/*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
 
@@ -94,6 +102,3 @@ router.post('/login', checkInfo, async (req, res) => {
     4- On FAILED login due to `username` not existing in the db, or `password` being incorrect,
       the response body should include a string exactly as follows: "invalid credentials".
   */
-});
-
-module.exports = router;
